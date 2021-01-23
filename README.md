@@ -7,7 +7,7 @@ browse twitch, watch streams, interact with chat
   - mpv video player
 
 
-## controls
+## Controls
   - "q" to quit
   - "w" and "s" to scroll channel selection
   - "p" to start playing stream with mpv
