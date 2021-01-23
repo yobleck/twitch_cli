@@ -1,5 +1,5 @@
 #https://stackoverflow.com/questions/2968408/how-do-i-program-a-simple-irc-bot-in-python
-import socket, sys, time, ssl;
+import socket, sys, time, ssl, json;
 
 
 class chat:
@@ -26,6 +26,7 @@ class chat:
         self.irc.send(bytes("NICK "+ self.nick + "\n", "utf-8")); #sets nick
         #self.irc.send(bytes("USER " + self.nick + " " + self.nick + " " + self.nick + " :This is a test\n", "utf-8")); #user authentication
         print("info sent");
+        time.sleep(.5);
     
     
     def get_text(self):
@@ -42,12 +43,15 @@ class chat:
     
     
     def send_text(self, text):
-        self.irc.send(bytes("PRIVMSG " + text + "\n", "utf-8"));
+        self.irc.send(bytes("PRIVMSG :" + text + "\n", "utf-8"));
     
     
-    def jp_channel(self, j_p, c_name): #j_p must be JOIN or PART    c_name must start with #
-        print(j_p, c_name);
-        self.irc.send(bytes(j_p + " " + c_name + "\n", "utf-8"));
+    
+    def join(self, c_name):
+        self.irc.send(bytes("JOIN " + str(c_name) + "\r\n", "utf-8")); #c_name must start with #
+        
+    def part(self, c_name):
+        self.irc.send(bytes("PART " + str(c_name) + "\r\n", "utf-8"));
     
     def quit(self):
         self.irc.send(bytes("QUIT\n", "utf-8"));
@@ -55,6 +59,7 @@ class chat:
 
 
 """
+#testing
 cht = chat(user="yobleck");
 cht.jp_channel(j_p="JOIN", c_name="#heyzeusherestoast");
 
