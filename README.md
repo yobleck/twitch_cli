@@ -18,6 +18,7 @@ browse twitch, watch streams, interact with chat
   - "enter" to send input buffer as chat message
  
 ## TODO:
+  - irc sometimes fails to connect. just restart (if no error in logs)
   - add proper color coding
   - add ability to send chat messages
   - tell if video is playing or closed to disallow opening multiple streams?
