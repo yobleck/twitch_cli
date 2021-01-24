@@ -11,7 +11,7 @@ class chat:
         self.channel = "";
         self.nick = user;
         
-        f = open("./api/client_info", "r"); #get chat password from file
+        f = open("./api/client_info.json", "r"); #get chat password from file
         j = json.load(f);
         f.close();
         self.password = j["chat_pass"]; #not quite as much of an idiot   #https://dev.twitch.tv/docs/irc/guide#connecting-to-twitch-irc

@@ -1,5 +1,5 @@
 import sys, os, time, subprocess;
-import getch, irc, tui, twitch_api;
+import getch, irc, tui;#, twitch_api;
 
 f = open("./following/follows", "r");
 follow_list = [x.rstrip() for x in f.readlines()];
@@ -60,7 +60,7 @@ while(running):
     if(char == "p" and not playing and not typing):
         playing = True;
         subprocess.Popen(["mpv", "https://www.twitch.tv/" + str(follow_list[follow_select])], #use Popen cause run is blocking
-                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL);
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); #TODO: properly kill process after exit (no zombies allowed)
     
     #send chat messages
     if(typing and char != -1): #input text but disallow some special characters
