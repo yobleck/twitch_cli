@@ -13,7 +13,9 @@ browse twitch, watch streams, interact with chat
   - "p" to start playing stream with mpv
   - "c" to join or leave chat
   - "tab" to toggle chat typing mode
-  - "enter" to send message to chat
+  - while typing "a-zA-Z0-9" are added to input buffer
+  - "backspace" to remove last character from input buffer
+  - "enter" to send input buffer as chat message
  
 ## TODO:
   - add proper color coding
