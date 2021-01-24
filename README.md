@@ -12,6 +12,8 @@ browse twitch, watch streams, interact with chat
   - "w" and "s" to scroll channel selection
   - "p" to start playing stream with mpv
   - "c" to join or leave chat
+  - "tab" to toggle chat typing mode
+  - "enter" to send message to chat
  
 ## TODO:
   - add proper color coding
