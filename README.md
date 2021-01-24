@@ -15,10 +15,8 @@ browse twitch, watch streams, interact with chat
  
 ## TODO:
   - add proper color coding
-  - fix input issues (not regsistering/latency)
-  - screen flicker when polling rate is too high (only update screen when list change?)
   - add ability to send chat messages
   - tell if video is playing or closed to disallow opening multiple streams?
-  - fix a variety of regex issues
+  - fix mpv being left as a zombie after closing
   - twitch api integration to get list of follows and live status
   - config file to allow changing of video player and other settings
