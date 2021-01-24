@@ -1,6 +1,8 @@
 #https://stackoverflow.com/questions/2968408/how-do-i-program-a-simple-irc-bot-in-python
 import socket, sys, time, ssl, json;
-
+def ltm():
+    t = time.localtime();
+    return str(t.tm_year) + "-" + str(t.tm_mon) + "-" + str(t.tm_mday);
 
 class chat:
     def __init__(self, user):
@@ -26,10 +28,10 @@ class chat:
         print("info sent");
         
         
-        f = open("./log.txt","a"); #header for new log session
+        f = open("./logs/" + ltm() + ".log","a"); #header for new log session
         f.write("\n" + time.ctime() + ": #####NEW SESSION#####\n");
         f.close();
-        time.sleep(.5);
+        time.sleep(.3);
     
     
     def get_text(self):
@@ -39,7 +41,7 @@ class chat:
             if("PING" in text):
                 self.irc.send(bytes("PONG " + text.split()[1] + "\r\n", "utf-8"));
             
-            f = open("./log.txt","a"); #logging
+            f = open("./logs/" + ltm() + ".log","a"); #logging
             f.write(time.ctime() + ": " + text + "\n");
             f.close();
             
@@ -49,9 +51,12 @@ class chat:
             return "nothing new";
     
     
-    def send_text(self, text):
-        self.irc.send(bytes("PRIVMSG :" + text + "\n", "utf-8"));
-    
+    def send_text(self, text, c_name):
+        self.irc.send(bytes("PRIVMSG " + c_name + " :" + text + "\n", "utf-8"));
+        
+        f = open("./logs/" + ltm() + ".log","a"); #logging
+        f.write(time.ctime() + ": MESSAGE SENT: " + text + "\n");
+        f.close();
     
     
     def join(self, c_name):

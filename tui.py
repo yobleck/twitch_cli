@@ -30,10 +30,14 @@ def format_text(text): #TODO: embed colors here then filter them out of len() in
     
     if("PRIVMSG" in text): #condense user messages by stripping out extra info
         text = re.search(pat_nick, text).group(0) + ": " + re.search(pat_msg, text).group(1);
+        return [ text[x:x+((columns//2)-2)] for x in range(0, len(text), (columns//2)-2) ]; #chop strings up into window width chunks
     
     if("PART" in text or "JOIN" in text): #simplify text for join and leave channel
         text = re.search(pat_nick, text).group(0) + " " + re.search(pat_jp, text).group(0);
+        text += "-"*( columns//2-2-len(text) ); #makes joining and leaving more obvious
+        return [ text[x:x+((columns//2)-2)] for x in range(0, len(text), (columns//2)-2) ]; #chop strings up into window width chunks
     
+    #if does not match any above just do minimum of splitting text
     return [ text[x:x+((columns//2)-2)] for x in range(0, len(text), (columns//2)-2) ]; #chop strings up into window width chunks
 
 ##########
@@ -48,7 +52,7 @@ def format_display(str_list, win_type, in_focus): #win_type= follows, chat
     if("chat" in win_type):
         buff = "\033[1C"*(columns//2); #https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797    ANSI escape sequences
         border_color = blue;
-        content_color = yellow;
+        content_color = green;
     
     
     output = "";
@@ -57,8 +61,8 @@ def format_display(str_list, win_type, in_focus): #win_type= follows, chat
     
     str_list = str_list[-(rows-3):]; #only get last set of lines that will fit on screen
     for x in str_list: #contents of chat
-        output += buff + "|" + content_color + str(x) + " "*( columns//2-2-len(str(x)) ) + border_color + "|\n";
-        #+len(re.findall(pat_ansi, x))
+        output += buff + "|" + content_color + re.sub(pat_nick, red+r"\g<0>"+reset, x) + " "*( columns//2-2-len(str(x)) ) + border_color + "|\n";
+    
     
     filler_h = rows - len(str_list) -3;
     output += (buff + border_color + "|" + " "*(columns//2-2) + "|\n")*(filler_h); #fills out the bottom if chat doesn't go all the way down
