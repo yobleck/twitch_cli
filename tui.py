@@ -8,25 +8,11 @@ def get_xy():
 ##########
 
 #regex definitions that only need to be created once
-pat_nick = re.compile(r":.*!"); #for nick  TODO: this is broken by twitch commands ": !do_thing"
-pat_msg = re.compile(r":(?!.*:).*"); #for msg  TODO: this breaks with stuff like ":("
+pat_nick = re.compile(r"^:.*?!");
+pat_msg = re.compile(r":[^:]*:(.*)");
 pat_jp = re.compile(r"PART.*$|JOIN.*$");
 e_filter = re.compile(r"[\U0000231A-\U00002B55\U0001F004-\U0001FAD6\U0001F170-\U0001F6F3\U0001F1E6-\U0001F1FC\U0001F3FB-\U0001F3FF]+");#emoji bad
 pat_ansi = re.compile(r"\033\[.{1,2}m");
-
-def format_text(text): #TODO: embed colors here then filter them out of len() in format_display
-    text = re.sub(r"[\n\t\r]*", "", text); #remove non alphanumeric chars
-    text = re.sub(e_filter, "", text);
-    
-    if("PRIVMSG" in text): #condense user messages by stripping out extra info
-        text = re.search(pat_nick, text).group(0) + " " + re.search(pat_msg, text).group(0);
-    
-    if("PART" in text or "JOIN" in text): #simplify text for join and leave channel
-        text = re.search(pat_nick, text).group(0) + " " + re.search(pat_jp, text).group(0);
-    
-    return [ text[x:x+((columns//2)-2)] for x in range(0, len(text), (columns//2)-2) ]; #chop strings up into window width chunks
-
-##########
 
 #ANSI Escape Sequences
 reset = "\033[0m";
@@ -36,6 +22,21 @@ yellow = "\033[33m";
 blue = "\033[34m";
 hor_line = "\u2015"; #horizontal line with no breaks (technically Unicode not ANSI)
 
+##########
+
+def format_text(text): #TODO: embed colors here then filter them out of len() in format_display
+    text = re.sub(r"[\n\t\r]*", "", text); #remove non alphanumeric chars
+    text = re.sub(e_filter, "", text);
+    
+    if("PRIVMSG" in text): #condense user messages by stripping out extra info
+        text = re.search(pat_nick, text).group(0) + ": " + re.search(pat_msg, text).group(1);
+    
+    if("PART" in text or "JOIN" in text): #simplify text for join and leave channel
+        text = re.search(pat_nick, text).group(0) + " " + re.search(pat_jp, text).group(0);
+    
+    return [ text[x:x+((columns//2)-2)] for x in range(0, len(text), (columns//2)-2) ]; #chop strings up into window width chunks
+
+##########
 
 def format_display(str_list, win_type, in_focus): #win_type= follows, chat
     if(type(str_list) is not list):
@@ -69,7 +70,7 @@ def format_display(str_list, win_type, in_focus): #win_type= follows, chat
 
 """
 #testing
-print(format_and_display([1,"CS",3,4,5,"RT",7,8], "info", False));
+print(format_display([1,"CS",3,4,5,"RT",7,8], "follows", False));
 print("\033[H");
-print(format_and_display([1,2,"POGGERS",4,5,6,7,"bob"], "chat", True));
+print(format_display([1,2,"POGGERS",4,5,6,7,"bob"], "chat", True));
 """

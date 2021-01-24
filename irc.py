@@ -9,14 +9,12 @@ class chat:
         self.channel = "";
         self.nick = user;
         
-        f = open("./api/client_info", "r");
+        f = open("./api/client_info", "r"); #get chat password from file
         j = json.load(f);
         f.close();
         self.password = j["chat_pass"]; #not quite as much of an idiot   #https://dev.twitch.tv/docs/irc/guide#connecting-to-twitch-irc
 
         self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
-        #context = ssl.create_default_context();
-        #irc = context.wrap_socket(irc_0);
         print("connecting");
         self.irc.connect((self.server, self.port));
         self.irc.setblocking(False);
@@ -26,6 +24,11 @@ class chat:
         self.irc.send(bytes("NICK "+ self.nick + "\n", "utf-8")); #sets nick
         #self.irc.send(bytes("USER " + self.nick + " " + self.nick + " " + self.nick + " :This is a test\n", "utf-8")); #user authentication
         print("info sent");
+        
+        
+        f = open("./log.txt","a"); #header for new log session
+        f.write("\n" + time.ctime() + ": #####NEW SESSION#####\n");
+        f.close();
         time.sleep(.5);
     
     
@@ -36,7 +39,11 @@ class chat:
             if("PING" in text):
                 self.irc.send(bytes("PONG " + text.split()[1] + "\r\n", "utf-8"));
             
-            return text; #TODO: format to only show user nick and text body
+            f = open("./log.txt","a"); #logging
+            f.write(time.ctime() + ": " + text + "\n");
+            f.close();
+            
+            return text;
 
         except Exception as e:
             return "nothing new";

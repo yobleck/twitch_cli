@@ -11,6 +11,7 @@ chat = irc.chat("yobleck");
 current_chat = "#" + str(follow_list[0]);
 #chat.join(current_chat);
 chat_list = [];
+last_chat = "placeholder";
 in_chat = False;
 input_text = "";
 
@@ -26,7 +27,7 @@ channel_info = [];
 
 running = True;
 while(running):
-    time.sleep(0.01);
+    #time.sleep(0.01);
     char = getch.getch_noblock();
     
     if(char in ["q", "\x1b"]):
@@ -39,7 +40,7 @@ while(running):
         follow_select -= 1;
         current_chat = "#" + str(follow_list[follow_select]);
     
-    if(char == "s" and follow_select < len(follow_list)):
+    if(char == "s" and follow_select < len(follow_list)-1):
         follow_select += 1;
         current_chat = "#" + str(follow_list[follow_select]);
     
@@ -59,12 +60,16 @@ while(running):
     
     #check to see if any new chat msg and add to list
     [chat_list.append(x) for x in tui.format_text(chat.get_text()) if x != "nothing new"];
+    if(len(chat_list) > 2*height): #remove oldest messages to manage memory
+        del chat_list[0];
     
-    #render contents on screen
-    print("\033[2J\033[H", end=""); #clear screen and return cursor to 0,0
-    print(tui.format_display(follow_list, "follows: " + str(follow_list[follow_select]), False));
-    print("\033[H", end=""); #return cursor to 0,0
-    print(tui.format_display(chat_list, "chat: " + str(current_chat), True));
+    if(char != -1 or last_chat != chat_list[-1]):
+        last_chat = chat_list[-1];
+        #render contents on screen
+        print("\033[2J\033[H", end=""); #clear screen and return cursor to 0,0
+        print(tui.format_display(follow_list, "follows: " + str(follow_list[follow_select]), False));
+        print("\033[H", end=""); #return cursor to 0,0
+        print(tui.format_display(chat_list, "chat: " + str(current_chat), True));
 
 #end while loop
 print("\033[2J\033[H");
