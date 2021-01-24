@@ -5,6 +5,16 @@ browse twitch, watch streams, interact with chat
   - python 3.7+
   - ANSI escape character capable terminal
   - mpv video player
+  
+  To connect to the irc server you must get an oauth password from: https://twitchapps.com/tmi/
+  and put it in ./api/client_info in the chat_pass section
+  
+  (NOTE: api currently not implemented)
+  
+  In order to get client id and secret for the api follow these instructions: https://dev.twitch.tv/docs/api/
+  
+  Because api is not being used atm, add follows manually to ./following/follows text file.
+  Use the username listed at the end of the url for the channel (all lowercase no spaces)
 
 
 ## Controls
