@@ -1,3 +1,0 @@
-username=yobleck
-get_channel_info_threads=8
-video_player=mpv
