@@ -68,8 +68,13 @@ while(running):
     #start stream
     if(char == "p" and not playing and not typing):
         playing = True;
-        subprocess.Popen(["mpv", "https://www.twitch.tv/" + str(follow_list[follow_select]["display_name"])], #uses Popen cause run is blocking
+        sp = subprocess.Popen(["mpv", "https://www.twitch.tv/" + str(follow_list[follow_select]["display_name"])], #uses Popen cause run is blocking
                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); #TODO: properly kill process after exit (no zombies allowed)
+    if("sp" in globals()):
+        if(sp.poll() is not None):
+            del sp;
+            playing = False;
+    
     
     #send chat messages
     if(typing and char != -1): #input text but disallow some special characters
