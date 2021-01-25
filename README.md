@@ -17,6 +17,8 @@ browse twitch, watch streams, interact with chat
   api startup causes moderate cpu and network spike as it gets live status of all follows
   
   mpv stutters on startup. pausing the stream for a second allows it to build up a buffer
+  
+  irc sometimes fails to connect. just restart (if no error in logs)
 
 
 ## Controls
@@ -28,9 +30,13 @@ browse twitch, watch streams, interact with chat
   - while typing "a-zA-Z0-9"(limited special chars) are added to input buffer (screen refresh sometimes eaths inputs. just try again)
   - "backspace" to remove last character from input buffer
   - "enter" to send input buffer as chat message
+
+## Config
+  - username should be your username as seen in twitch chat
+  - get_channel_info_threads should be "default" or a number from 1 to number of cpu threads(examples 4, 8, 16)
  
 ## TODO:
-  - irc sometimes fails to connect. just restart (if no error in logs)
+  - irc sometimes fails to connect
   - add proper color coding (sorta works but crude)
   - check for live status every x amount of time
   - config file to allow changing of video player, username, network threads and other settings
