@@ -19,7 +19,7 @@ def get_channel_info(c_name):
     params = (("query", c_name),);
     
     response = requests.get("https://api.twitch.tv/helix/search/channels", headers=headers, params=params);
-    print(response.status_code);
+    #print(response.status_code);
     
     results = json.loads(response.text.rstrip()); #str -> json obj
     return results["data"][0];
@@ -31,22 +31,40 @@ def get_user_info(c_name):
     params = (("login", c_name),);
     
     response = requests.get("https://api.twitch.tv/helix/users", headers=headers, params=params);
-    print(response.status_code);
+    #print(response.status_code);
+    if(response.status_code != requests.codes.ok):
+        raise Exception("get_user_info returned: " + str(response.status_code) + " status code");
     
     results = json.loads(response.text.rstrip());
     return results;
 
 ##########
 
-def get_user_follows(c_name):
+def get_user_follows(c_name, pagination): #pagination is None or string
+    if(type(c_name) is str):
+        user_id = int(get_user_info(c_name)["data"][0]["id"]); #convert user name to id type int
+    elif(type(c_name) is int):
+        user_id = c_name; #username is already user id
+    else:
+        raise Exception("c_name must be username as str or id as int. got: " + str(c_name) + " of type: " + str(type(c_name)));
+    
     headers = {"client-id": client_id, "Authorization": "Bearer " + oauth_token,};
-    params = (("from_id", get_user_info(c_name)["data"][0]["id"]),);
+    if(pagination):
+        params = (("from_id", user_id),("first", 100),("after", pagination),);
+    else:
+        params = (("from_id", user_id),("first", 100),);
     
     response = requests.get("https://api.twitch.tv/helix/users/follows", headers=headers, params=params);
-    print(response.status_code);
+    #print(response.status_code);
+    if(response.status_code != requests.codes.ok):
+        raise Exception("get_user_follows returned: " + str(response.status_code) + " status code");
     
     results = json.loads(response.text.rstrip());
-    #TODO: parse out channel names and loop through pagination
+    
+    if(results["pagination"]):
+        next_page = get_user_follows(user_id, results["pagination"]["cursor"]);
+        results["data"] += next_page["data"]; 
+    
     return results;
 
 ##########

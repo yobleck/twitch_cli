@@ -1,14 +1,19 @@
 import sys, os, time, subprocess;
-import getch, irc, tui;#, twitch_api;
+from multiprocessing import Pool;
+import getch, irc, tui, twitch_api;
 
-f = open("./following/follows", "r");
-follow_list = [x.rstrip() for x in f.readlines()];
-f.close();
+
+follow_bad_name = [x["to_name"] for x in twitch_api.get_user_follows("yobleck", None)["data"]]; #get list of follows
+#this list uses the wrong name format
+
+print("loading follows...");
+with Pool(len(os.sched_getaffinity(0))) as p:
+    follow_list = p.map(twitch_api.get_channel_info, follow_bad_name);
 
 
 ###chat vars
 chat = irc.chat("yobleck");
-highlighted_chat = "#" + str(follow_list[0]);
+highlighted_chat = "#" + str(follow_list[0]["display_name"]);
 current_chat = "";
 chat_list = [];
 last_chat = "placeholder";
@@ -20,7 +25,7 @@ input_text = "";
 ###ui vars
 width, height = tui.get_xy();
 
-follow_scroll = [0, height];
+follow_scroll = [0, height-3];
 follow_select = 0;
 playing = False;
 channel_info = [];
@@ -39,11 +44,15 @@ while(running):
     #channel selection
     if(char == "w" and follow_select > 0 and not typing):
         follow_select -= 1;
-        highlighted_chat = "#" + str(follow_list[follow_select]);
+        highlighted_chat = "#" + str(follow_list[follow_select]["display_name"]);
+        if(follow_select < follow_scroll[0]):
+            follow_scroll[0] -= 1; follow_scroll[1] -= 1; #scrolling list up
     
     if(char == "s" and follow_select < len(follow_list)-1 and not typing):
         follow_select += 1;
-        highlighted_chat = "#" + str(follow_list[follow_select]);
+        highlighted_chat = "#" + str(follow_list[follow_select]["display_name"]);
+        if(follow_select >= follow_scroll[1]):
+            follow_scroll[0] += 1; follow_scroll[1] += 1; #scrolling list down
     
     #join and leave chat
     if(char == "c" and not typing):
@@ -59,12 +68,12 @@ while(running):
     #start stream
     if(char == "p" and not playing and not typing):
         playing = True;
-        subprocess.Popen(["mpv", "https://www.twitch.tv/" + str(follow_list[follow_select])], #use Popen cause run is blocking
+        subprocess.Popen(["mpv", "https://www.twitch.tv/" + str(follow_list[follow_select]["display_name"])], #uses Popen cause run is blocking
                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); #TODO: properly kill process after exit (no zombies allowed)
     
     #send chat messages
     if(typing and char != -1): #input text but disallow some special characters
-        if(char not in ["\t", "\n", "\r"]):
+        if(char not in ["\t", "\n", "\r"] and len(input_text) < width-9): #limit length for testing
             input_text += char;
         if(char == "\x7f"): #backspace
             input_text = input_text[:-2];
@@ -84,13 +93,19 @@ while(running):
         del chat_list[0];
     
     if(char != -1 or last_chat != chat_list[-1]): #only updates screen when something happens
-        last_chat = chat_list[-1];
-        #render contents on screen
+        last_chat = chat_list[-1]; #TODO: this line will indicate crash if chat did not connect properly
+        ###render contents on screen###
         print("\033[2J\033[H", end=""); #clear screen and return cursor to 0,0
-        print(tui.format_display(follow_list, "follows: " + str(follow_list[follow_select]), False));
+        
+        #get correct name from json list and part of list that is on screen
+        print(tui.format_display([x["display_name"] + " live:" + str(x["is_live"]) for x in follow_list[follow_scroll[0]:follow_scroll[1]]],
+                                 "follows: " + str(follow_list[follow_select]["display_name"]), False));
+        
         print("\033[H", end=""); #return cursor to 0,0
+        
         print(tui.format_display(chat_list, "chat: " + str(current_chat) + " typing=" + str(typing), True));
-        print("\033[Finput: " + input_text);
+        
+        print("\033[Finput: \033[33m" + input_text + "\033[0m");
 
 #end while loop
 print("\033[2J\033[H");
