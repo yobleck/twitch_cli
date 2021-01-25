@@ -16,7 +16,7 @@ follow_list = twitch_api.get_channel_info_mp(follow_bad_name); #get follow displ
 
 
 ###chat vars
-chat = irc.chat("yobleck");
+chat = irc.chat(username);
 highlighted_chat = "#" + str(follow_list[0]["display_name"]);
 current_chat = "";
 chat_list = [];
