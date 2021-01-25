@@ -1,14 +1,18 @@
-import sys, os, time, subprocess;
-from multiprocessing import Pool;
-import getch, irc, tui, twitch_api;
+import sys, os, time, json, subprocess;
+import getch, irc, tui, twitch_api; #local imports
 
 
-follow_bad_name = [x["to_name"] for x in twitch_api.get_user_follows("yobleck", None)["data"]]; #get list of follows
+#load config
+f = open("./config.json", "r");
+j_config = json.load(f);
+f.close();
+username = j_config["username"];
+
+
+follow_bad_name = [x["to_name"] for x in twitch_api.get_user_follows(None)["data"]]; #get list of follows
 #this list uses the wrong name format
-
 print("loading follows...");
-with Pool(len(os.sched_getaffinity(0))) as p:
-    follow_list = p.map(twitch_api.get_channel_info, follow_bad_name);
+follow_list = twitch_api.get_channel_info_mp(follow_bad_name); #get follow display names and live status
 
 
 ###chat vars
@@ -68,8 +72,8 @@ while(running):
     #start stream
     if(char == "p" and not playing and not typing):
         playing = True;
-        sp = subprocess.Popen(["mpv", "https://www.twitch.tv/" + str(follow_list[follow_select]["display_name"])], #uses Popen cause run is blocking
-                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); #TODO: properly kill process after exit (no zombies allowed)
+        sp = subprocess.Popen(["mpv", "https://www.twitch.tv/" + str(follow_list[follow_select]["display_name"])], #uses Popen cause run blocks
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL);
     if("sp" in globals()):
         if(sp.poll() is not None):
             del sp;
@@ -110,7 +114,7 @@ while(running):
         
         print(tui.format_display(chat_list, "chat: " + str(current_chat) + " typing=" + str(typing), True));
         
-        print("\033[Finput: \033[33m" + input_text + "\033[0m");
+        print("\033[F" + username + ": \033[33m" + input_text + "\033[0m");
 
 #end while loop
 print("\033[2J\033[H");

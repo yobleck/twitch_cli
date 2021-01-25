@@ -1,5 +1,9 @@
 import json, requests;
+from os import sched_getaffinity;
+from multiprocessing import Pool;
 
+
+#load info from files
 f = open("./api/client_info.json", "r");
 j_client = json.load(f);
 f.close();
@@ -11,6 +15,16 @@ f = open("./api/oauth.json", "r");
 j_oauth = json.load(f);
 f.close();
 oauth_token = j_oauth["access_token"];
+
+f = open("./config.json", "r");
+j_config = json.load(f);
+f.close();
+username = j_config["username"];
+#user_id has to be defined after get_user_info()
+if(j_config["get_channel_info_threads"] == "default"):
+    num_threads = len(sched_getaffinity(0));
+else:
+    num_threads = int(j_config["get_channel_info_threads"]);
 
 ##########
 
@@ -26,9 +40,16 @@ def get_channel_info(c_name):
 
 ##########
 
-def get_user_info(c_name):
+def get_channel_info_mp(i_list): #runs multiple instances of above function for speed
+    with Pool(num_threads) as p:
+        o_list = p.map(get_channel_info, i_list);
+    return o_list;
+
+##########
+
+def get_user_info():
     headers = {"client-id": client_id, "Authorization": "Bearer " + oauth_token,};
-    params = (("login", c_name),);
+    params = (("login", username),);
     
     response = requests.get("https://api.twitch.tv/helix/users", headers=headers, params=params);
     #print(response.status_code);
@@ -38,16 +59,10 @@ def get_user_info(c_name):
     results = json.loads(response.text.rstrip());
     return results;
 
+user_id = int(get_user_info()["data"][0]["id"]);
 ##########
 
-def get_user_follows(c_name, pagination): #pagination is None or string
-    if(type(c_name) is str):
-        user_id = int(get_user_info(c_name)["data"][0]["id"]); #convert user name to id type int
-    elif(type(c_name) is int):
-        user_id = c_name; #username is already user id
-    else:
-        raise Exception("c_name must be username as str or id as int. got: " + str(c_name) + " of type: " + str(type(c_name)));
-    
+def get_user_follows(pagination): #pagination is None or string
     headers = {"client-id": client_id, "Authorization": "Bearer " + oauth_token,};
     if(pagination):
         params = (("from_id", user_id),("first", 100),("after", pagination),);
@@ -62,7 +77,7 @@ def get_user_follows(c_name, pagination): #pagination is None or string
     results = json.loads(response.text.rstrip());
     
     if(results["pagination"]):
-        next_page = get_user_follows(user_id, results["pagination"]["cursor"]);
+        next_page = get_user_follows(results["pagination"]["cursor"]);
         results["data"] += next_page["data"]; 
     
     return results;
@@ -88,7 +103,7 @@ def validate_oauth_token():
     rv = requests.get("https://id.twitch.tv/oauth2/validate", headers = {"Authorization": "OAuth " + oauth_token,});
     expires = json.loads(rv.text.rstrip())["expires_in"];
     if(expires < 0):
-        #TODO: not actually sure what to do here
+        #TODO: not actually sure what to do here. might not work for app access token. just get new one?
         pass;
 
 
