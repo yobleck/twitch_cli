@@ -13,8 +13,7 @@ browse twitch, watch streams, interact with chat
   
   In order to get client id and secret for the api follow these instructions: https://dev.twitch.tv/docs/api/
   
-  Because api is not being used atm, add follows manually to ./following/follows text file.
-  Use the username listed at the end of the url for the channel (all lowercase no spaces)
+  api startup causes moderate cpu and network spike as it gets live status of all follows
 
 
 ## Controls
@@ -32,5 +31,5 @@ browse twitch, watch streams, interact with chat
   - add proper color coding (sorta works but crude)
   - tell if video is playing or closed to disallow opening multiple streams?
   - fix mpv being left as a zombie after closing
-  - twitch api integration to get list of follows and live status WIP
-  - config file to allow changing of video player and other settings
+  - check for live status every x amount of time
+  - config file to allow changing of video player, username, network threads and other settings
