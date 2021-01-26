@@ -1,18 +1,33 @@
 import sys, os, time, json, subprocess;
 import getch, irc, tui, twitch_api; #local imports
-
+from distutils.util import strtobool;
 
 #load config
 f = open("./config.json", "r");
 j_config = json.load(f);
 f.close();
 username = j_config["username"];
+if(strtobool(j_config["run_initial_startup"])):
+    print("running intial set up...");
+    subprocess.run(["python", "initial_startup.py"],stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL);
+    j_config["run_initial_startup"] = "False";
+    f = open("./config.json", "w"); json.dump(j_config, f, indent=2); f.close();
+
+#load follows
+f = open("./following/follows.json", "r");
+j_follows = json.load(f);
+f.close();
+follow_list = j_follows["data"];
 
 
-follow_bad_name = [x["to_name"] for x in twitch_api.get_user_follows(None)["data"]]; #get list of follows
-#this list uses the wrong name format
-print("loading follows...");
-follow_list = twitch_api.get_channel_info_mp(follow_bad_name); #get follow display names and live status
+print("loading follows live status...");
+follow_live = twitch_api.get_stream_info_mp([x["user_id"] for x in follow_list]); #get follow live status
+
+for x in range(len(follow_list)):
+    if(follow_live[x]):
+        follow_list[x]["is_live"] = True;
+    else:
+        follow_list[x]["is_live"] = False;
 
 
 ###chat vars
@@ -93,6 +108,7 @@ while(running):
             typing = True;
     if(char == "\n" and input_text and current_chat): #send message
         chat.send_text(input_text, current_chat);
+        [chat_list.append(x) for x in tui.format_text(":" + username + "!: " + input_text)];
         input_text = "";
     
     
@@ -114,7 +130,7 @@ while(running):
         
         print(tui.format_display(chat_list, "chat: " + str(current_chat) + " typing=" + str(typing), True));
         
-        print("\033[F" + username + ": \033[33m" + input_text + "\033[0m");
+        print("\033[F\033[33m" + username + ": " + input_text + "\033[0m");
 
 #end while loop
 print("\033[2J\033[H");

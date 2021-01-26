@@ -16,6 +16,7 @@ j_oauth = json.load(f);
 f.close();
 oauth_token = j_oauth["access_token"];
 
+#load config
 f = open("./config.json", "r");
 j_config = json.load(f);
 f.close();
@@ -28,28 +29,32 @@ else:
 
 ##########
 
-def get_channel_info(c_name):
+def get_stream_info(u_id):
     headers = {"client-id": client_id, "Authorization": "Bearer " + oauth_token,};
-    params = (("query", c_name),);
-    
-    response = requests.get("https://api.twitch.tv/helix/search/channels", headers=headers, params=params);
-    #print(response.status_code);
+    params = (("user_id", u_id),);
+    #params = (("query", c_name),);
+    #response = requests.get("https://api.twitch.tv/helix/search/channels", headers=headers, params=params);
+    response = requests.get("https://api.twitch.tv/helix/streams", headers=headers, params=params);
     
     results = json.loads(response.text.rstrip()); #str -> json obj
-    return results["data"][0];
+    #return results["data"][0];
+    return results["data"];
 
-##########
+#####
 
-def get_channel_info_mp(i_list): #runs multiple instances of above function for speed
+def get_stream_info_mp(i_list): #runs multiple instances of above function for speed
     with Pool(num_threads) as p:
-        o_list = p.map(get_channel_info, i_list);
+        o_list = p.map(get_stream_info, i_list);
     return o_list;
 
 ##########
 
-def get_user_info():
+def get_user_info(u_type, u_id_name):
     headers = {"client-id": client_id, "Authorization": "Bearer " + oauth_token,};
-    params = (("login", username),);
+    if(u_type == "login"):
+        params = (("login", u_id_name),);
+    if(u_type == "id"):
+        params = (("id", u_id_name),);
     
     response = requests.get("https://api.twitch.tv/helix/users", headers=headers, params=params);
     #print(response.status_code);
@@ -59,7 +64,15 @@ def get_user_info():
     results = json.loads(response.text.rstrip());
     return results;
 
-user_id = int(get_user_info()["data"][0]["id"]);
+user_id = int(get_user_info("login", username)["data"][0]["id"]);
+
+#####
+
+def get_user_info_mp(i_list): #runs multiple instances of above function for speed
+    with Pool(num_threads) as p:
+        o_list = p.starmap( get_user_info, list(zip(["id"]*len(i_list), i_list)) );
+    return o_list;
+
 ##########
 
 def get_user_follows(pagination): #pagination is None or string

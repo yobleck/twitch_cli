@@ -1,5 +1,1 @@
-{
-"username":"yobleck",
-"get_channel_info_threads":"default",
-"video_player":"mpv"
-}
+{"username": "yobleck", "get_channel_info_threads": "default", "video_player": "mpv", "run_initial_startup": "False"}
