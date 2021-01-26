@@ -11,7 +11,7 @@ browse twitch, watch streams, interact with chat
   To connect to the irc server you must get an oauth password from: https://twitchapps.com/tmi/
   and put it in ./api/client_info in the chat_pass section
   
-  make user the config var "run_initial_setup" is "True" the first time you ru nthe program, and give it some time. This is caused by some annoying twitch api design choices.
+  Make user the config var "run_initial_setup" is "True" the first time you run the program, and give it some time. This is caused by some annoying twitch api design choices.
   
   In order to get client id and secret for the api follow these instructions: https://dev.twitch.tv/docs/api/
   
