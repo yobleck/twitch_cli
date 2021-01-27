@@ -97,7 +97,7 @@ while(running):
     
     #send chat messages
     if(typing and char != -1): #input text but disallow some special characters
-        if(char not in ["\t", "\n", "\r"] and len(input_text) < width-9): #limit length for testing
+        if(char not in ["\t", "\n", "\r"] and len(input_text) < width-len(username)-4): #limit length for testing
             input_text += char;
         if(char == "\x7f"): #backspace
             input_text = input_text[:-2];
@@ -117,7 +117,8 @@ while(running):
     if(len(chat_list) > 2*height): #remove oldest messages to manage memory
         del chat_list[0];
     
-    if(char != -1 or last_chat != chat_list[-1]): #only updates screen when something happens
+    #only updates screen when something happens.
+    if(char != -1 or last_chat != chat_list[-1]): #IF YOU ARE SEEING THIS THEN IRC FAILED TO CONNECT JUST TRY AGAIN
         last_chat = chat_list[-1]; #TODO: this line will indicate crash if chat did not connect properly
         ###render contents on screen###
         print("\033[2J\033[H", end=""); #clear screen and return cursor to 0,0
