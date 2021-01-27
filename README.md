@@ -39,5 +39,6 @@ browse twitch, watch streams, interact with chat
 ## TODO:
   - irc sometimes fails to connect
   - add proper color coding (sorta works but crude)
+  - rewrite api interface to ask for info on multiple channels at the same time instead of sending multiple requests
   - check for live status every x amount of time
   - config file to allow changing of video player, username, network threads and other settings
