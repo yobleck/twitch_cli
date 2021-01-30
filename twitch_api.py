@@ -1,23 +1,24 @@
-import json, requests;
+import json, requests, sys;
 from os import sched_getaffinity;
 from multiprocessing import Pool;
 
+cwd = sys.path[0] + "/";
 
 #load info from files
-f = open("./api/client_info.json", "r");
+f = open(cwd + "api/client_info.json", "r");
 j_client = json.load(f);
 f.close();
 client_id = j_client["client-id"];
 client_secret = j_client["client-secret"];
 #print(client_id, client_secret);
 
-f = open("./api/oauth.json", "r");
+f = open(cwd + "api/oauth.json", "r");
 j_oauth = json.load(f);
 f.close();
 oauth_token = j_oauth["access_token"];
 
 #load config
-f = open("./config.json", "r");
+f = open(cwd + "config.json", "r");
 j_config = json.load(f);
 f.close();
 username = j_config["username"];

@@ -1,8 +1,13 @@
 #https://stackoverflow.com/questions/2968408/how-do-i-program-a-simple-irc-bot-in-python
 import socket, sys, time, ssl, json;
+
+cwd = sys.path[0] + "/";
+
+
 def ltm():
     t = time.localtime();
     return str(t.tm_year) + "-" + str(t.tm_mon) + "-" + str(t.tm_mday);
+
 
 class chat:
     def __init__(self, user):
@@ -11,7 +16,7 @@ class chat:
         self.channel = "";
         self.nick = user;
         
-        f = open("./api/client_info.json", "r"); #get chat password from file
+        f = open(cwd+ "api/client_info.json", "r"); #get chat password from file
         j = json.load(f);
         f.close();
         self.password = j["chat_pass"]; #not quite as much of an idiot   #https://dev.twitch.tv/docs/irc/guide#connecting-to-twitch-irc
@@ -28,7 +33,7 @@ class chat:
         print("info sent");
         
         
-        f = open("./logs/" + ltm() + ".log","a"); #header for new log session
+        f = open(cwd+ "logs/" + ltm() + ".log","a"); #header for new log session
         f.write("\n" + time.ctime() + ": #####NEW SESSION#####\n");
         f.close();
         time.sleep(.3);
@@ -41,7 +46,7 @@ class chat:
             if("PING" in text):
                 self.irc.send(bytes("PONG " + text.split()[1] + "\r\n", "utf-8"));
             
-            f = open("./logs/" + ltm() + ".log","a"); #logging
+            f = open(cwd+ "logs/" + ltm() + ".log","a"); #logging
             f.write(time.ctime() + ": " + text + "\n");
             f.close();
             
@@ -54,7 +59,7 @@ class chat:
     def send_text(self, text, c_name):
         self.irc.send(bytes("PRIVMSG " + c_name + " :" + text + "\n", "utf-8"));
         
-        f = open("./logs/" + ltm() + ".log","a"); #logging
+        f = open(cwd+ "logs/" + ltm() + ".log","a"); #logging
         f.write(time.ctime() + ": MESSAGE SENT: " + text + "\n");
         f.close();
     

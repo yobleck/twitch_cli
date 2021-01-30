@@ -2,8 +2,10 @@ import sys, os, time, json, subprocess;
 import getch, irc, tui, twitch_api; #local imports
 from distutils.util import strtobool;
 
+cwd = sys.path[0] + "/";
+
 #load config
-f = open("./config.json", "r");
+f = open(cwd + "config.json", "r");
 j_config = json.load(f);
 f.close();
 username = j_config["username"];
@@ -11,10 +13,10 @@ if(strtobool(j_config["run_initial_startup"])):
     print("running intial set up...");
     subprocess.run(["python", "initial_startup.py"],stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL);
     j_config["run_initial_startup"] = "False";
-    f = open("./config.json", "w"); json.dump(j_config, f, indent=2); f.close();
+    f = open(cwd+ "config.json", "w"); json.dump(j_config, f, indent=2); f.close();
 
 #load follows
-f = open("./following/follows.json", "r");
+f = open(cwd+ "following/follows.json", "r");
 j_follows = json.load(f);
 f.close();
 follow_list = j_follows["data"];

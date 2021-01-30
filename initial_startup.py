@@ -1,6 +1,7 @@
-import json;
+import sys, json;
 import twitch_api;
 
+cwd = sys.path[0] + "/";
 
 data = [{"user_name":x["to_name"],"user_id":x["to_id"]} for x in twitch_api.get_user_follows(None)["data"]]; #get list of follows
 
@@ -11,6 +12,6 @@ for x in range(len(data)):
 
 #write out to file
 j = {"data":data};
-f= open("./following/follows.json","w");
+f= open(cwd+ "following/follows.json","w");
 json.dump(j,f);
 f.close();
