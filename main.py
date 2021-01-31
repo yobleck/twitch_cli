@@ -126,7 +126,7 @@ while(running):
         print("\033[2J\033[H", end=""); #clear screen and return cursor to 0,0
         
         #get correct name from json list and part of list that is on screen
-        print(tui.format_display([x["display_name"] + " live:" + str(x["is_live"]) for x in follow_list[follow_scroll[0]:follow_scroll[1]]],
+        print(tui.format_display([x["display_name"] + " live:" + tui.format_bool(x["is_live"]) for x in follow_list[follow_scroll[0]:follow_scroll[1]]],
                                  "follows: " + str(follow_list[follow_select]["display_name"]), False));
         
         print("\033[H", end=""); #return cursor to 0,0
