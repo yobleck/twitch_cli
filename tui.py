@@ -62,7 +62,7 @@ def format_display(str_list, win_type, in_focus): #win_type= follows, chat
     
     str_list = str_list[-(rows-3):]; #only get last set of lines that will fit on screen
     for x in str_list: #contents of chat
-        output += buff + "|" + content_color + re.sub(pat_nick, red+r"\g<0>"+reset, x) + border_move + border_color + "|\n";
+        output += buff + "|" + content_color + re.sub(pat_nick, red+r"\g<0>"+content_color, x) + border_move + border_color + "|\n";
     #" "*( columns//2-2-len(str(x)) )
     
     filler_h = rows - len(str_list) -3;
@@ -77,9 +77,9 @@ def format_display(str_list, win_type, in_focus): #win_type= follows, chat
 
 def format_bool(i_bool): #to make true values stand out from false values by color
     if(i_bool):
-        return blue + str(i_bool) + reset;
+        return blue + "live" + reset;
     else:
-        return str(i_bool);
+        return "";
 
 """
 #testing
