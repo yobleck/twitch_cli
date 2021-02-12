@@ -37,6 +37,7 @@ browse twitch, watch streams, interact with chat
   - get_channel_info_threads should be "default" or a number from 1 to number of cpu threads(examples 4, 8, 16)
  
 ## TODO:
+  - keybind to get stream info like title etc.
   - irc sometimes fails to connect
   - add proper color coding (sorta works but crude)
   - rewrite api interface to ask for info on multiple channels at the same time instead of sending multiple requests. also autorefresh api oauth token
