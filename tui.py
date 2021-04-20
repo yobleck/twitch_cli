@@ -66,7 +66,7 @@ def format_display(str_list, win_type, in_focus): #win_type= follows, chat
     #" "*( columns//2-2-len(str(x)) )
     
     filler_h = rows - len(str_list) -3;
-    output += (buff + border_color + "|" + " "*(columns//2-1) + "|\n")*(filler_h); #fills out the bottom if chat doesn't go all the way down
+    output += (buff + border_color + "|" + " "*(columns//2-(2 if columns%2==0 else 1)) + "|\n")*(filler_h); #fills out the bottom if chat doesn't go all the way down
     
     
     output += buff + border_color + "\u2015"*(columns//2) + reset; #bottom border

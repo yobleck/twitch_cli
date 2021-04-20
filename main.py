@@ -27,7 +27,7 @@ follow_live = twitch_api.get_stream_info_mp([x["user_id"] for x in follow_list])
 
 for x in range(len(follow_list)):
     if(follow_live[x]):
-        follow_list[x]["is_live"] = True;
+        follow_list[x]["is_live"] = True; #TODO: if live then "i" key to draw temp window with stream info when selected
     else:
         follow_list[x]["is_live"] = False;
 
