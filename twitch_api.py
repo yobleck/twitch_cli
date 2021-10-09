@@ -2,7 +2,7 @@ import json, requests, sys;
 from os import sched_getaffinity;
 from multiprocessing import Pool;
 
-cwd = sys.path[0] + "/";
+cwd = sys.path[0] + "/"; #add period before slash when refreshing token manually
 
 #load info from files
 f = open(cwd + "api/client_info.json", "r");
@@ -60,12 +60,12 @@ def get_user_info(u_type, u_id_name):
     response = requests.get("https://api.twitch.tv/helix/users", headers=headers, params=params);
     #print(response.status_code);
     if(response.status_code != requests.codes.ok):
-        raise Exception("get_user_info returned: " + str(response.status_code) + " status code");
+        raise Exception("get_user_info returned: " + str(response.status_code) + " status code"); #refresh api token?
     
     results = json.loads(response.text.rstrip());
     return results;
 
-user_id = int(get_user_info("login", username)["data"][0]["id"]);
+user_id = int(get_user_info("login", username)["data"][0]["id"]); #comment out when refreshing
 
 #####
 
@@ -105,9 +105,9 @@ def get_fresh_oauth_token():
                                                                  "grant_type":"client_credentials"});
     if(r.status_code == requests.codes.ok): #TODO: potential formatting issues
         f = open("./api/oauth.json", "w");
-        json.dump(r.text.rstrip(),f);
+        json.dump(r.json(),f);
         f.close();
-        return r.text;
+        return r.json();
     else:
         raise Exception("failed to get oauth token http status: " + str(r.status_code));
 
@@ -115,6 +115,7 @@ def get_fresh_oauth_token():
 #refresh old token
 def validate_oauth_token():
     rv = requests.get("https://id.twitch.tv/oauth2/validate", headers = {"Authorization": "OAuth " + oauth_token,});
+    #TODO: response 401 if invalid/expired token
     expires = json.loads(rv.text.rstrip())["expires_in"];
     if(expires < 0):
         #TODO: not actually sure what to do here. might not work for app access token. just get new one?
