@@ -60,12 +60,18 @@ def get_user_info(u_type, u_id_name):
     response = requests.get("https://api.twitch.tv/helix/users", headers=headers, params=params);
     #print(response.status_code);
     if(response.status_code != requests.codes.ok):
+        if response.status_code == 401:
+            print("trying to get new oauth token. try restarting")
+            try:
+                get_fresh_oauth_token()
+            except Exception as e:
+                print("failed to get new oauth token:", e)
         raise Exception("get_user_info returned: " + str(response.status_code) + " status code"); #refresh api token?
     
     results = json.loads(response.text.rstrip());
     return results;
 
-user_id = int(get_user_info("login", username)["data"][0]["id"]); #comment out when refreshing
+#user_id = int(get_user_info("login", username)["data"][0]["id"]); #comment out when refreshing
 
 #####
 
@@ -104,7 +110,7 @@ def get_fresh_oauth_token():
                                                                  "client_secret":client_secret,
                                                                  "grant_type":"client_credentials"});
     if(r.status_code == requests.codes.ok): #TODO: potential formatting issues
-        f = open("./api/oauth.json", "w");
+        f = open(cwd + "api/oauth.json", "w");
         json.dump(r.json(),f);
         f.close();
         return r.json();
@@ -122,6 +128,7 @@ def validate_oauth_token():
         pass;
 
 
+user_id = int(get_user_info("login", username)["data"][0]["id"]); #comment out when refreshing
 
 #https://dev.twitch.tv/console/apps     my app
 #https://dev.twitch.tv/docs/api/reference      actual api methods

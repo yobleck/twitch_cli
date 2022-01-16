@@ -9,7 +9,7 @@ f = open(cwd + "config.json", "r");
 j_config = json.load(f);
 f.close();
 username = j_config["username"];
-if(strtobool(j_config["run_initial_startup"])):
+if(strtobool(j_config["run_initial_startup"])):  # WARNING distutils deprecated. just do: ... in ["True", "true", "Yes", "yes"]
     print("running intial set up...");
     subprocess.run(["python", "initial_startup.py"],stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL);
     j_config["run_initial_startup"] = "False";
